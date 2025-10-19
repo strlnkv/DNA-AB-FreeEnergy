@@ -1,0 +1,107 @@
+
+units  real
+dimension       3
+atom_style full
+boundary        p p p
+
+bond_style harmonic
+angle_style hybrid harmonic charmm tbaserestr
+dihedral_style charmm/omp
+improper_style harmonic
+pair_style lj/charmm/coul/long 10.0 12.0 12
+pair_modify mix arithmetic
+special_bonds charmm
+read_data lmp_dat.txt
+
+pair_coeff 17 35 0.102434 2.82417
+
+kspace_style pppm 1.0e-4
+variable out1 equal time
+compute paPE all pe/atom
+compute pe all reduce sum c_paPE
+group dna type 1:30
+group ions type 35
+group eth type 31:34
+group water type 36 37
+group i1 id 1270 1273 1276 1277 1283 1290 1291 1293
+group i1s subtract ions i1
+group i2 id 1266 1268 1280 1281 1292 1294 1296
+group i2s subtract ions i2
+group i3 id 1260 1289
+group i3s subtract ions i3
+group i4 id 1267 1272
+group i4s subtract ions i4
+group i5 id 1259 1275 1278 1287
+group i5s subtract ions i5
+group i6 id 1271 1274 1285 1286
+group i6s subtract ions i6
+group i7 id 1261 1262 1263 1264 1265 1269 1279 1282 1284 1288 1295
+group i7s subtract ions i7
+compute 1 dna group/group dna kspace yes
+compute 2 dna group/group ions kspace yes
+compute 3 dna group/group water kspace yes
+compute 4 dna group/group eth kspace yes
+compute 5 ions group/group ions kspace yes
+compute 6 ions group/group water kspace yes
+compute 7 ions group/group eth kspace yes
+compute 8 water group/group water kspace yes
+compute 9 water group/group eth kspace yes
+compute 10 eth group/group eth kspace yes
+compute dnaintr dna pe/atom bond angle dihedral improper
+compute sdnaintr dna reduce sum c_dnaintr
+compute ethintr eth pe/atom bond angle dihedral improper
+compute sethintr eth reduce sum c_ethintr
+compute watintr water pe/atom bond angle
+compute swatintr water reduce sum c_watintr
+variable 1t equal c_1+c_sdnaintr
+variable 8t equal c_8+c_swatintr
+variable 10t equal c_10+c_sethintr
+
+fix o1 all ave/time 1 1 1 v_out1 v_1t c_2 c_3 c_4 c_5 c_6 c_7 v_8t c_9 v_10t c_pe  &
+                   file tmpresfull.txt title1 "step time DNASelf DNA-Ions DNA-Water DNA-Ethanol IonsSelf Ions-Water Ions-Ethanol WaterSelf Water-Ethanol EthanolSelf Total"
+compute i1s i1 group/group i1 kspace yes
+compute i1cr i1 group/group i1s kspace yes
+variable i1ion equal c_i1s+c_i1cr/2
+compute i1dna i1 group/group dna kspace yes
+compute i1eth i1 group/group eth kspace yes
+compute i1wat i1 group/group water kspace yes
+compute i2s i2 group/group i2 kspace yes
+compute i2cr i2 group/group i2s kspace yes
+variable i2ion equal c_i2s+c_i2cr/2
+compute i2dna i2 group/group dna kspace yes
+compute i2eth i2 group/group eth kspace yes
+compute i2wat i2 group/group water kspace yes
+compute i3s i3 group/group i3 kspace yes
+compute i3cr i3 group/group i3s kspace yes
+variable i3ion equal c_i3s+c_i3cr/2
+compute i3dna i3 group/group dna kspace yes
+compute i3eth i3 group/group eth kspace yes
+compute i3wat i3 group/group water kspace yes
+compute i4s i4 group/group i4 kspace yes
+compute i4cr i4 group/group i4s kspace yes
+variable i4ion equal c_i4s+c_i4cr/2
+compute i4dna i4 group/group dna kspace yes
+compute i4eth i4 group/group eth kspace yes
+compute i4wat i4 group/group water kspace yes
+compute i5s i5 group/group i5 kspace yes
+compute i5cr i5 group/group i5s kspace yes
+variable i5ion equal c_i5s+c_i5cr/2
+compute i5dna i5 group/group dna kspace yes
+compute i5eth i5 group/group eth kspace yes
+compute i5wat i5 group/group water kspace yes
+compute i6s i6 group/group i6 kspace yes
+compute i6cr i6 group/group i6s kspace yes
+variable i6ion equal c_i6s+c_i6cr/2
+compute i6dna i6 group/group dna kspace yes
+compute i6eth i6 group/group eth kspace yes
+compute i6wat i6 group/group water kspace yes
+compute i7s i7 group/group i7 kspace yes
+compute i7cr i7 group/group i7s kspace yes
+variable i7ion equal c_i7s+c_i7cr/2
+compute i7dna i7 group/group dna kspace yes
+compute i7eth i7 group/group eth kspace yes
+compute i7wat i7 group/group water kspace yes
+
+fix o2 all ave/time 1 1 1 v_out1 v_i1ion c_i1dna c_i1wat c_i1eth v_i2ion c_i2dna c_i2wat c_i2eth v_i3ion c_i3dna c_i3wat c_i3eth v_i4ion c_i4dna c_i4wat c_i4eth v_i5ion c_i5dna c_i5wat c_i5eth v_i6ion c_i6dna c_i6wat c_i6eth v_i7ion c_i7dna c_i7wat c_i7eth  &
+                   file tmpresperpock.txt title1 "step time PhCr_ion dna wat eth MajDirSide_ion dna wat eth MajSlv_ion dna wat eth MinSlv_ion dna wat eth PhSS_ion dna wat eth Ph_ion dna wat eth Bulk_ion dna wat eth"
+run 0
