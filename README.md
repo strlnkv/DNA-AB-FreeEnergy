@@ -15,6 +15,6 @@ rst.pdb - input coordinates with DNA in model B form and solvent at random posit
 
 rst.psf - input structure files (packed in structure_and_coordinates.rar)
 
-dna.txt - sample input file for LAMMPS used to calculate potential energy components for the whole system, as well as for ions in different pockets; ions corresponding to different pockets in the current frame should be assigned to separate groups (i* in the input file) and the same computes should be defined for each group
+dna.txt - sample input file for LAMMPS used to calculate potential energy components for the whole system, as well as for ions in different pockets; ions corresponding to different pockets in the current frame should be assigned to separate groups (i* in the input file) and the same computes should be defined for each group. LAMMPS dihedral charmm style should be modified in order to correctly take into account the 1-4 nonbonded energy in this calculation (modification example is provided in this repository: dihedral_charmm_omp.cpp)
 
 lmp_dat.txt - sample input structure file for LAMMPS, the coordinates and box sizes here should be replaced with the ones from the trajectory frame being analyzed (packed in structure_and_coordinates.rar)
